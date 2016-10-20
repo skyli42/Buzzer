@@ -3,7 +3,7 @@
 <head>
   <title>Buzz </title>
   <script src="/socket.io/socket.io.js"></script>
-  <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+  <script src="/js/jquery.js"></script>
   <!-- <script src="/js/jquery.js"></script> -->
   <link type="text/css" rel="stylesheet" href="/css/materialize.min.css"  media="screen,projection"/>
   <script src="/js/materialize.min.js"></script>
@@ -35,7 +35,7 @@
     var socket = io();
     function sub(){
       var n=$("#name").val();
-      console.log(n);
+      // console.log(n);
       socket.emit('new player', n);
     }
     $('#buzzer').click(function(){
@@ -47,7 +47,7 @@
       $('#messages').append($('<li>').text(msg+" buzzed!"));
     });
     socket.on('reset', function(){
-      console.log('reset')
+      // console.log('reset')
       $('#buzzer').prop('disabled', false);
       $('#messages').append($('<li>').text('reset!'));
     })
