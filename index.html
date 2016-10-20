@@ -50,6 +50,7 @@
       // console.log('reset')
       $('#buzzer').prop('disabled', false);
       $('#messages').append($('<li>').text('reset!'));
+      $('#messages').append('<div class="divider"></div>');
     })
     $('#reset').click(function(){
       socket.emit('reset')
