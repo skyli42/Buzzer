@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Buzz </title>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+  <!-- <script src="/js/jquery.js"></script> -->
+  <link type="text/css" rel="stylesheet" href="/css/materialize.min.css"  media="screen,projection"/>
+  <script src="/js/materialize.min.js"></script>
+  <link type="text/css" rel="stylesheet" href="/css/main.css">
+</head>
+
+<body>
+
+  <div class="container">
+    <button id="buzzer" disabled="true">BUZZ</button>
+    <button id="reset">reset</button>
+    <ul id="messages"></ul>
+    <div id="modal1" class="modal">
+      <div class="modal-content">
+        <form id="name_form" >
+          What is your name?
+          <br />
+          <input type="text" id="name" autocomplete = "off" autofocus="autofocus" onfocus="this.select()">
+          <!-- <input type="submit" value="Done"> -->
+        </form>
+      </div>
+      <div class="modal-footer">
+        <a href="#" id="submit_button" class="modal-action modal-close waves-effect waves-green btn-flat">Done</a>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    var socket = io();
+    function sub(){
+      var n=$("#name").val();
+      console.log(n);
+      socket.emit('new player', n);
+    }
+    $('#buzzer').click(function(){
+      socket.emit('buzz', socket.id);
+      return false;
+    });
+    socket.on('buzz', function(msg){
+      $('#buzzer').prop('disabled', true);
+      $('#messages').append($('<li>').text(msg+" buzzed!"));
+    });
+    socket.on('reset', function(){
+      console.log('reset')
+      $('#buzzer').prop('disabled', false);
+      $('#messages').append($('<li>').text('reset!'));
+    })
+    $('#reset').click(function(){
+      socket.emit('reset')
+    })
+    $(document).ready(function(){
+      $('.modal-trigger').leanModal();
+      $("#modal1").openModal(); 
+      $('$')
+    });
+    $("#submit_button").click(function(){
+      $("#name_form").submit(function(e){
+        e.preventDefault();
+        sub();
+      });
+    });
+    $(document).keydown(function (event) {
+      if (event.which == 13 || event.keyCode == 13) { 
+        sub();
+        $("#modal1").closeModal();
+        return false;
+      }
+      else return true;
+    }); 
+  </script>
+</body>
+</html>
