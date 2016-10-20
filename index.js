@@ -1,7 +1,9 @@
 var express=require('express');
 var app = express();
-var http = require('http').Server(app);
-var io = require('socket.io')(http);
+var http = require('http');
+var app = express();
+var server = http.createServer(app);
+var io = require('socket.io').listen(server);
 var players=new Map();
 
 app.use(express.static("./assets"));
@@ -29,7 +31,8 @@ var buzz=function(id){
 	console.log(id)
 }
 
-
-http.listen(process.env.PORT, function(){
-  console.log('listening on *:3000');
-});
+server.listen(app.listen(process.env.PORT || 3000, function() {
+  var host = server.address().address;
+  var port = server.address().port;
+  console.log('Listening at http://%s:%s', host, port);
+}));
