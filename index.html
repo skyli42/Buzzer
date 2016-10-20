@@ -11,61 +11,64 @@
 </head>
 
 <body>
-
   <div class="container">
-    <button id="buzzer" disabled="true">BUZZ</button>
-    <button id="reset">reset</button>
-    <ul id="messages"></ul>
+    <div class="row">
+      <a href="#"><div id="buzzer" class="col s6 disabled button">Buzz</div></a>
+      <a href="#"><div id="reset" class="col s6 button">reset</div></a>
+    </div>  
+    <div class="messages"><ul id="messages"></ul></div>
+    <div class="divider"></div>
+    <p><b>Connections:</b></p>
+    <ul id="connections">
+    </ul>
     <div id="modal1" class="modal">
       <div class="modal-content">
         <form id="name_form" >
           What is your name?
           <br />
           <input type="text" id="name" autocomplete = "off" autofocus="autofocus" onfocus="this.select()">
-          <!-- <input type="submit" value="Done"> -->
         </form>
       </div>
       <div class="modal-footer">
         <a href="#" id="submit_button" class="modal-action modal-close waves-effect waves-green btn-flat">Done</a>
       </div>
     </div>
+
   </div>
-  
   <script>
     var socket = io();
-    function sub(){
-      var n=$("#name").val();
-      // console.log(n);
-      socket.emit('new player', n);
+    function sub(){socket.emit('new player', $('#name').val());}
+    function updateConnections(array){
+      $('#connections').empty();
+      for(var i in array){
+        $('#connections').append($('<li>').text(array[i]));
+      }
     }
-    $('#buzzer').click(function(){
-      socket.emit('buzz', socket.id);
-      return false;
-    });
     socket.on('buzz', function(msg){
-      $('#buzzer').prop('disabled', true);
-      $('#messages').append($('<li>').text(msg+" buzzed!"));
+      $('#buzzer').addClass('disabled');
+      $('#messages').prepend($('<li>').text(msg+" buzzed!"));
     });
     socket.on('reset', function(){
-      // console.log('reset')
-      $('#buzzer').prop('disabled', false);
-      $('#messages').append($('<li>').text('reset!'));
-      $('#messages').append('<div class="divider"></div>');
+      $('#buzzer').removeClass('disabled');
+      $('#messages').prepend($('<li>').text('reset!'));
+      $('#messages').prepend('<div class="divider"></div>');
+    });
+    socket.on('new connection', function(msg){
+      Materialize.toast(msg.id+" has connected!", 4000);
+      updateConnections(msg.arr);
     })
-    $('#reset').click(function(){
-      socket.emit('reset')
+    socket.on('disconnection', function(msg){
+      Materialize.toast(msg.id+" has disconnected", 4000);
+      updateConnections(msg.arr);
     })
+    $('#reset').click(function(){socket.emit('reset')});
     $(document).ready(function(){
-      $('.modal-trigger').leanModal();
-      $("#modal1").openModal(); 
-      $('$')
+      $("#modal1").openModal({
+        dismissible:false
+      });
     });
-    $("#submit_button").click(function(){
-      // $("#name_form").submit(function(e){
-        // e.preventDefault();
-        sub();
-      // });
-    });
+
+    $("#submit_button").click(function(){sub();});
     $(document).keydown(function (event) {
       if (event.which == 13 || event.keyCode == 13) { 
         sub();
@@ -74,6 +77,11 @@
       }
       else return true;
     }); 
+    $('#buzzer').click(function(){
+      if(!$('#buzzer').hasClass('disabled')){
+        socket.emit('buzz', socket.id);
+      }
+    });
   </script>
 </body>
 </html>
