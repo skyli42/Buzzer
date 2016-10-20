@@ -3,6 +3,7 @@ var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var players=new Map();
+
 app.use(express.static("./assets"));
 app.get('/', function(req, res){
   res.sendFile(__dirname+ '/index.html');
@@ -29,6 +30,6 @@ var buzz=function(id){
 }
 
 
-http.listen(3000, function(){
+http.listen(process.env.PORT, function(){
   console.log('listening on *:3000');
 });
