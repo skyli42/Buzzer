@@ -47,6 +47,8 @@
     socket.on('buzz', function(msg){
       $('#buzzer').addClass('disabled');
       $('#messages').prepend($('<li>').text(msg+" buzzed!"));
+      var audio = new Audio('/media/airhorn.wav');
+      audio.play();
     });
     socket.on('reset', function(){
       $('#buzzer').removeClass('disabled');
