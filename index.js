@@ -43,8 +43,9 @@ var buzz=function(id){
 	io.emit('buzz', players.get(id));
 }
 
-server.listen(app.listen(process.env.PORT || 3000, function() {
-	var host = server.address().address;
-	var port = server.address().port;
-	console.log('Listening at http://%s:%s', host, port);
-}));
+var listenPort = 3010
+if(process.env.PORT != undefined){
+	listenPort = process.env.PORT;
+}
+
+app.listen(listenPort, () => console.log('Example app listening on port 3000!'))
