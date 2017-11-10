@@ -14,7 +14,8 @@
   "keywords": [],
   "description": "Simple online buzzer system for Quiz Bowl practice",
   "dependencies": {
-    "express": "^4.16.2"
+    "express": "^4.16.2",
+    "socket.io": "^1.7.3"
   },
   "devDependencies": {}
 }
