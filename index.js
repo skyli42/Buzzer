@@ -1,7 +1,7 @@
 var express=require('express');
 var app = express();
-var http = require('http');
-var server = http.createServer(app);
+// var http = require('http');
+var server = app.listen(process.env.PORT||3000);
 var io = require('socket.io').listen(server);
 var players=new Map();
 
