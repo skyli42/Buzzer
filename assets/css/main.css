@@ -2,7 +2,8 @@ body{
 	background-color: #faf9f0;
 }
 a{
-	color:black;
+	color:blue;
+	text-decoration:underline;
 }
 .messages{
 	height:200px;
