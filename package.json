@@ -1,5 +1,5 @@
 {
-  "name": "qbBuzzer",
+  "name": "QBBuzz",
   "version": "1.0.0",
   "engines": {
     "node": "6.11.3"
@@ -9,13 +9,12 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js"
   },
-  "author": "",
+  "author": "Sky Li",
   "license": "ISC",
   "keywords": [],
   "description": "Simple online buzzer system for Quiz Bowl practice",
   "dependencies": {
     "express": "^4.16.2",
     "socket.io": "^2.0.4"
-  },
-  "devDependencies": {}
+  }
 }
