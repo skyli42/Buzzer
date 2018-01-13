@@ -12,15 +12,29 @@
 <body>
   <div class="container">
     <div class="row">
+      <a href="#"><div id="startq" class="col s6 button">New Question</div></a>
+      <a href="#"><div id="startgame" class="col s6 button">Start Game (not implemented)</div></a>
+    </div>  
+
+    <div class = "row" id = "question">
+      <p id = "questionText"></p>
+
+    </div>
+    <div class="row">
       <a href="#"><div id="buzzer" class="col s6 disabled button">Buzz</div></a>
       <a href="#"><div id="reset" class="col s6 button">reset</div></a>
     </div>  
     <div class="messages"><ul id="messages"></ul></div>
     <div class="divider"></div>
     <p><b>Connections:</b></p>
-    <ul id="connections">
-    </ul>
+    <ul id="connections"> </ul>
     <div class="divider"></div>
+    <p>
+      ========================================
+      THIS IS AN EXPERIMENTAL VERSION OF QBBUZZ
+      =========================================
+
+    </p>
     <p><b>About QBBuzz:</b></p>
     <p id = "about">
       QBBuzz was built by Sky Li primarily for the Acton-Boxborough Quiz Bowl team. It allows users to connect to a synchronized buzzer online, helping to facilitate online practices. Players can name themselves, buzz, and see who buzzed. When a new player joins, the buzzer should be reset so that they can sync with everyone else. 
@@ -29,6 +43,7 @@
       QBBuzz was built with Node.JS using an Express framework for the server, socket.io for server-client communication, and MaterializeCSS for client UI. It is hosted on a free Heroku dyno.
     </p>
     <p>
+
       See the source code on GitHub <a href = "https://github.com/skyli42/Buzzer"> here</a>
     </p>
     <div id="modal1" class="modal">
@@ -43,57 +58,41 @@
         <a href="#" id="submit_button" class="modal-action modal-close waves-effect waves-green btn-flat">Done</a>
       </div>
     </div>
-
   </div>
+  <script src = "/js/globalVars.js"></script>
+  <script src = "/js/reader.js"></script>
+  <script src = "/js/socket.js"></script>
+  <script src = "/js/buttons.js"></script>
   <script>
-    var socket = io();
-    function sub(){socket.emit('new player', $('#name').val());}
-    function updateConnections(array){
-      $('#connections').empty();
-      for(var i in array){
-        $('#connections').append($('<li>').text(array[i]));
-      }
-    }
-    socket.on('buzz', function(msg){
-      $('#buzzer').addClass('disabled');
-      $('#messages').prepend($('<li>').text(msg+" buzzed!"));
-      var audio = new Audio('/media/buzz_sound.mp3');
-      audio.play();
-    });
-    socket.on('reset', function(){
-      $('#buzzer').removeClass('disabled');
-      $('#messages').prepend($('<li>').text('reset!'));
-      $('#messages').prepend('<div class="divider"></div>');
-    });
-    socket.on('new connection', function(msg){
-      Materialize.toast(msg.id+" has connected!", 4000);
-      updateConnections(msg.arr);
-    })
-    socket.on('disconnection', function(msg){
-      Materialize.toast(msg.id+" has disconnected", 4000);
-      updateConnections(msg.arr);
-    })
-    $('#reset').click(function(){socket.emit('reset')});
     $(document).ready(function(){
       $("#modal1").openModal({
         dismissible:false
       });
     });
-
-    $("#submit_button").click(function(){sub();});
-    $(document).keydown(function (event) {
+    $(window).keypress(function (e) {
       if (event.which == 13 || event.keyCode == 13) { 
-        sub();
+        socket.emit('new player', $('#name').val());
         $("#modal1").closeModal();
         return false;
       }
-      else return true;
-    }); 
-    $('#buzzer').click(function(){
-      if(!$('#buzzer').hasClass('disabled')){
-        socket.emit('buzz', socket.id);
+      else if (e.keyCode === 0 || e.keyCode === 32) {
+        e.preventDefault()
+        var focused = $(':focus');
+        if(!focused.is("input") && !$('#buzzer').hasClass('disabled')){
+          socket.emit('buzz', socket.id)
+        }
+        else if($('#buzzer').hasClass('disabled')){
+          Materialize.toast("You can't buzz right now!", 2000)
+        }
       }
-    });
+      else if(e.keyCode === 82||e.keyCode === 114){
+        socket.emit("reset")
+      }
+      else if(e.keyCode == 67||e.keyCode == 99){
+        socket.emit("continue")
+      }
+      else return true;
+    })
   </script>
 </body>
 </html>

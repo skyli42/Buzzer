@@ -4,6 +4,34 @@ var app = express();
 var server = app.listen(process.env.PORT||3000);
 var io = require('socket.io').listen(server);
 var players=new Map();
+// var sqlite3 = require('sqlite3').verbose();
+// var db = new sqlite3.Database('./db.sqlite');
+
+// db.serialize(function() {
+// 	db.each("SELECT Question, answer from tossupsdbnew order by random() limit 40", function(err, row) {
+// 		ans = row.Answer.toString().replace("&#8203;", "").replace("\\n", "").replace("\\\"").replace("\'").replace(/\s*\(.*?\)\s*/g, '').replace(/ *\[[^\]]*]/, '');
+// 		bracketInd = ans.indexOf('[')
+// 		parenInd = ans.indexOf('(')
+// 		ans = ans.substring(0, bracketInd===-1?ans.length:bracketInd).substring(0, parenInd===-1?ans.length:parenInd)
+// 		console.log(ans)
+// 		question = row.Question.replace(/(<([^>]+)>)/ig,"").replace("&#8203;", "")
+		
+// 	});
+// });
+
+// db.close();
+
+var fs = require('fs')
+var raw = fs.readFileSync("./databases/protobowl411.json");
+console.log("database read")
+var db = JSON.parse(raw)
+
+var hsDb = []
+for(var i = 0; i<db.length; i++){
+	if(db[i].difficulty == "HS"){
+		hsDb.push(db[i])
+	}
+}
 
 app.use(express.static("./assets"));
 app.get('/', function(req, res){
@@ -11,7 +39,6 @@ app.get('/', function(req, res){
 });
 
 io.on('connection', function(socket){
-	console.log('a user connected');
 	socket.on('new player', function(msg){
 		console.log("connect")
 		players.set(socket.client.id, msg);
@@ -22,7 +49,7 @@ io.on('connection', function(socket){
 		io.emit('new connection', send);
 	})
 	socket.on('buzz', function(msg){
-		buzz(msg);
+		io.emit('buzz', players.get(msg));
 	})
 	socket.on('reset', function(){
 		io.emit('reset');
@@ -37,15 +64,13 @@ io.on('connection', function(socket){
 		// io.emit('new connection', Array.from(players.values()));
 		io.emit('disconnection', send);
 	})
+	socket.on('new question', function(){
+		var randQ = hsDb[Math.floor(Math.random() * hsDb.length)];
+		io.emit('new question', randQ)
+	})
+	socket.on("continue", function(){
+		io.emit('continue')
+	})
 });
 
-var buzz=function(id){
-	io.emit('buzz', players.get(id));
-}
-
-var listenPort = 3010
-if(process.env.PORT != undefined){
-	listenPort = process.env.PORT;
-}
-
-// app.listen(process.env.PORT||3000, () => console.log('Example app listening on port 3000!'))
+console.log("QBBuzz listening on port "+3000+"!")

@@ -1,13 +1,30 @@
 body{
-	background-color: #faf9f0;
+	background-color: #FAEBD7;
 }
 a{
+	color:black;
+}
+p a{
 	color:blue;
 	text-decoration:underline;
 }
 .messages{
 	height:200px;
 	overflow: auto;
+}
+#startq{
+	background-color:green;
+}
+#startgame{
+	background-color:blue;
+}
+#question{
+	background-color:white;
+}
+#questionText{
+	min-height:200px;
+	
+	padding:10px;
 }
 .button{
 	height:100px;
