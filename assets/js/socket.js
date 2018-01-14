@@ -59,8 +59,8 @@ socket.on("you buzz", function(){
 socket.on("correct", function(msg){
   $("#curBuzz").remove()
   $("#messages").prepend($("<li>").html(`${msg.player.name}: ${msg.answer} (${msg.value} points)`))
-  var ind = msg.ind
-  $("#questionText").append(msg.question.question.split(" ").slice(ind,msg.question.question.split(" ").length).join(" "))
+  // var ind = msg.ind
+  // $("#questionText").append(msg.question.question.split(" ").slice(ind,msg.question.question.split(" ").length).join(" "))
   socket.emit("update connections")
 })
 socket.on('incorrect', function(msg){
