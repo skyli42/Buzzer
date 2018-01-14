@@ -15,6 +15,9 @@ socket.on('update', function(msg){
   if(i != -1&& !msg.ended){
     $("#startq").addClass("disabled")
   }
+  if(msg.answerShown){
+    $("#buzzer").addClass("disabled")
+  }
   if(question != null){
     $("#questionInfo").html(`Tournament: ${question.tournament} ${question.year} (${question.difficulty})`)
     $("#questionText").html(question.question.split(" ").slice(0, i).join(" "))

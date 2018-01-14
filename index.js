@@ -197,6 +197,8 @@ io.on('connection', function(socket){
 					question: curQ,
 					ind:curInd
 				})
+								curInd = curQ.question.split(" ").length
+
 				questionTimer.stop()
 			}
 			
