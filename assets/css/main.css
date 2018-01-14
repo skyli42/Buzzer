@@ -1,5 +1,16 @@
+@font-face {
+    font-family: Open_Sans;
+    src: url(/fonts/Open_Sans/OpenSans-Regular.ttf);
+}
+@font-face {
+    font-family: Open_Sans;
+    src: url(/fonts/Open_Sans/OpenSans-Bold.ttf);
+    font-weight:bold;
+}
+
 body{
 	background-color: #FAEBD7;
+	font-family:"Open_Sans";
 }
 a{
 	color:black;
@@ -39,10 +50,30 @@ p a{
 	background-color:black;
 	color:white;
 }
+#startq.disabled{
+	background-color:#DDDDDD;
+}
+#startgame.disabled{
+	background-color:#DDDDDD;
+}
 #buzzer.disabled{
 	background-color:#DDDDDD;
 }
-
+#reset.disabled{
+	background-color:#DDDDDD;
+}
 .row{
 	margin-top:50px;
+}
+.box{
+	min-height:20px;
+	min-width:20px;
+	max-width:20px;
+	text-align:center;
+	display:inline-block;
+}
+#timer{
+	text-align:center;
+	min-height:100px;
+	line-height: 100px
 }

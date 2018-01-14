@@ -1,28 +1,34 @@
 <html>
 <head>
   <title>Buzz </title>
-  <script src="/js/socket.io.slim.js"></script>
-  <script src="/js/jquery.js"></script>
-  <!-- <script src="/js/jquery.js"></script> -->
+  <script src="/js/lib/socket.io.slim.js"></script>
+  <script src="/js/lib/jquery.js"></script>
+  <script src="/js/lib/timer.min.js"></script>
   <link type="text/css" rel="stylesheet" href="/css/materialize.min.css"  media="screen,projection"/>
-  <script src="/js/materialize.min.js"></script>
+  <script src="/js/lib/materialize.min.js"></script>
   <link type="text/css" rel="stylesheet" href="/css/main.css">
+  <link rel="shortcut icon" type="image/png" href="/media/favicon.png"/>
 </head>
 
 <body>
   <div class="container">
     <div class="row">
       <a href="#"><div id="startq" class="col s6 button">New Question</div></a>
-      <a href="#"><div id="startgame" class="col s6 button">Start Game (not implemented)</div></a>
+      <!-- <a href="#"><div id="startgame" class="col s6 button disabled">Start Game (not implemented)</div></a> -->
     </div>  
-
-    <div class = "row" id = "question">
+    <div id = "answerText">
+      ANSWER: 
+    </div>
+    <div id = "question">
       <p id = "questionText"></p>
-
+    </div>
+    <div id="questionInfo">
+      Tournament: 
     </div>
     <div class="row">
-      <a href="#"><div id="buzzer" class="col s6 disabled button">Buzz</div></a>
-      <a href="#"><div id="reset" class="col s6 button">reset</div></a>
+      <a href="#"><div id="buzzer" class="col s6 button">Buzz</div></a>
+      <div id = "timer" class= "col s2 offset-s2"></div>
+      <!-- <a href="#"><div id="reset" class="col s6 button disabled">reset</div></a> -->
     </div>  
     <div class="messages"><ul id="messages"></ul></div>
     <div class="divider"></div>
@@ -30,10 +36,9 @@
     <ul id="connections"> </ul>
     <div class="divider"></div>
     <p>
-      ========================================
+      =========================================
       THIS IS AN EXPERIMENTAL VERSION OF QBBUZZ
       =========================================
-
     </p>
     <p><b>About QBBuzz:</b></p>
     <p id = "about">
@@ -43,56 +48,102 @@
       QBBuzz was built with Node.JS using an Express framework for the server, socket.io for server-client communication, and MaterializeCSS for client UI. It is hosted on a free Heroku dyno.
     </p>
     <p>
-
       See the source code on GitHub <a href = "https://github.com/skyli42/Buzzer"> here</a>
     </p>
-    <div id="modal1" class="modal">
-      <div class="modal-content">
-        <form id="name_form" >
-          What is your name?
-          <br />
-          <input type="text" id="name" autocomplete = "off" autofocus="autofocus" onfocus="this.select()">
-        </form>
-      </div>
-      <div class="modal-footer">
-        <a href="#" id="submit_button" class="modal-action modal-close waves-effect waves-green btn-flat">Done</a>
-      </div>
+  </div>
+  
+  <div id="modal1" class="modal">
+    <div class="modal-content">
+      <form id="name_form" >
+        What is your name?
+        <br />
+        <input type="text" id="name" autocomplete = "off" autofocus="autofocus" onfocus="this.select()">
+      </form>
+    </div>
+    <div class="modal-footer">
+      <a href="#" id="submit_button" class="modal-action modal-close waves-effect waves-green btn-flat">Done</a>
     </div>
   </div>
-  <script src = "/js/globalVars.js"></script>
-  <script src = "/js/reader.js"></script>
-  <script src = "/js/socket.js"></script>
-  <script src = "/js/buttons.js"></script>
-  <script>
-    $(document).ready(function(){
-      $("#modal1").openModal({
-        dismissible:false
-      });
-    });
-    $(window).keypress(function (e) {
-      if (event.which == 13 || event.keyCode == 13) { 
-        socket.emit('new player', $('#name').val());
-        $("#modal1").closeModal();
-        return false;
+  <div id="answerModal" class="modal">
+    <div class="modal-content">
+      <form id="name_form" >
+        Answer?
+        <br />
+        <input type="text" id="answerInput" autocomplete = "off" autofocus="autofocus" onfocus="this.select()">
+      </form>
+      <div id= "buzzTimer"></div>
+    </div>
+  </div>
+<script src = "/js/globalVars.js"></script>
+<script src = "/js/socket.js"></script>
+<script src = "/js/buttons.js"></script>
+<script>
+  $(document).ready(function(){
+    $("#modal1").modal({
+      dismissible:false,
+      ready:function(modal, trigger){
+        window.curModal = "name"
+      },
+      complete: function(){
+        console.log("complete")
+        window.curModal = null
       }
-      else if (e.keyCode === 0 || e.keyCode === 32) {
+    }).modal('open');
+  });
+  $(window).keypress(function (e) {
+    // console.log(e.keyCode)
+    if (event.which == 13 || event.keyCode == 13) {
+      e.preventDefault()
+      if(window.curModal === "name"){
+        socket.emit('new player', $('#name').val());
+        $("#modal1").modal('close');
+        $("#name").val("")
+        window.curModal = null
+      }
+      else if (window.curModal === "buzz"){
+        buzzTimer.stop()
+        socket.emit("answer", {
+          ans:$("#answerInput").val(),
+          id:socket.id
+        });
+        $("#answerInput").val("")
+        $("#answerModal").modal('close')
+        window.curModal = null
+      }
+      else{
+        //chat
+      }
+      return false;
+    }
+    else if (e.keyCode === 0 || e.keyCode === 32) {
+      if(window.curModal==null){
         e.preventDefault()
         var focused = $(':focus');
         if(!focused.is("input") && !$('#buzzer').hasClass('disabled')){
-          socket.emit('buzz', socket.id)
+          buzz()
         }
         else if($('#buzzer').hasClass('disabled')){
           Materialize.toast("You can't buzz right now!", 2000)
         }
       }
-      else if(e.keyCode === 82||e.keyCode === 114){
+    }
+    else if(e.keyCode === 82||e.keyCode === 114){
+      // console.log(window.curModal)
+      if(window.curModal == null && !$("#reset").hasClass("disabled"))
         socket.emit("reset")
-      }
-      else if(e.keyCode == 67||e.keyCode == 99){
+    }
+    else if(e.keyCode === 67||e.keyCode === 99){
+      // console.log(window.curModal)
+      if(window.curModal == null)
         socket.emit("continue")
+    }
+    else if(e.keyCode === 110 || e.keyCode === 78){
+      if(window.curModal == null && !$("#startq").hasClass("disabled")){
+        next();
       }
-      else return true;
-    })
-  </script>
+    }
+    else return true;
+  })
+</script>
 </body>
 </html>
