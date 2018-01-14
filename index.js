@@ -17,13 +17,13 @@ app.get('/', function(req, res){
 	res.sendFile(__dirname+ '/index.html');
 });
 
-var hsDb = db
-// for(var i = 0; i<db.length; i++){
-// 	if(db[i].difficulty == "HS"){
-// 		hsDb.push(db[i])
-// 	}
-// }
-
+var hsDb = []
+for(var i = 0; i<db.length; i++){
+	if(db[i].difficulty == "HS"){
+		hsDb.push(db[i])
+	}
+}
+db = hsDb
 var stop = null
 var cont = null
 var paused = true
