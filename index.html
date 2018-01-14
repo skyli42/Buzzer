@@ -74,23 +74,34 @@
       <div id= "buzzTimer"></div>
     </div>
   </div>
-<script src = "/js/globalVars.js"></script>
-<script src = "/js/socket.js"></script>
-<script src = "/js/buttons.js"></script>
-<script>
-  $(document).ready(function(){
-    $("#modal1").modal({
-      dismissible:false,
-      ready:function(modal, trigger){
-        window.curModal = "name"
-      },
-      complete: function(){
-        console.log("complete")
-        window.curModal = null
-      }
-    }).modal('open');
-  });
-  $(window).keypress(function (e) {
+  <div id="promptModal" class="modal">
+    <div class="modal-content">
+      <form id="name_form" >
+        Answer?
+        <br />
+        <input type="text" id="promptInput" autocomplete = "off" autofocus="autofocus" onfocus="this.select()">
+      </form>
+      <div id= "promptTimer"></div>
+    </div>
+  </div>
+
+  <script src = "/js/globalVars.js"></script>
+  <script src = "/js/socket.js"></script>
+  <script src = "/js/buttons.js"></script>
+  <script>
+    $(document).ready(function(){
+      $("#modal1").modal({
+        dismissible:false,
+        ready:function(modal, trigger){
+          window.curModal = "name"
+        },
+        complete: function(){
+          console.log("complete")
+          window.curModal = null
+        }
+      }).modal('open');
+    });
+    $(window).keypress(function (e) {
     // console.log(e.keyCode)
     if (event.which == 13 || event.keyCode == 13) {
       e.preventDefault()
@@ -102,13 +113,13 @@
       }
       else if (window.curModal === "buzz"){
         buzzTimer.stop()
-        socket.emit("answer", {
-          ans:$("#answerInput").val(),
-          id:socket.id
-        });
-        $("#answerInput").val("")
-        $("#answerModal").modal('close')
-        window.curModal = null
+        // socket.emit("answer", {
+        //   ans:$("#answerInput").val(),
+        //   id:socket.id
+        // });
+        // $("#answerInput").val("")
+        // $("#answerModal").modal('close')
+        // window.curModal = null
       }
       else{
         //chat

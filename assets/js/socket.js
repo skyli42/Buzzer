@@ -2,11 +2,13 @@ function updateConnections(array){
   $('#connections').empty();
   for(var i in array){
     $('#connections').append(
-      $('<li>').html(`<div class = 'box' style='background: ${array[i].color}; color:${array[i].color}'>&nbsp; </div> ${array[i].name}`)
-    );
+      $('<li>').html(`<div class = 'box' style='background: ${array[i].color}; color:${array[i].color}'>&nbsp; </div> ${array[i].name}: ${array[i].points}`)
+      );
   }
 
 }
+socket.on('update connections', (array)=>updateConnections(array))
+
 socket.on('update', function(msg){
   question = msg.question
   i = msg.index
@@ -40,6 +42,7 @@ socket.on("you buzz", function(){
   $("#answerModal").modal({
     dismissible: false,
     inDuration: 0,
+    outDuration:0,
     ready: function(modal, trigger){
       window.curModal = "buzz"
       $("#answerInput").focus()
@@ -51,35 +54,42 @@ socket.on("you buzz", function(){
   buzzTimer.start(5)
 })
 socket.on("correct", function(msg){
-  
-  var value = 10
   $("#curBuzz").remove()
-  $("#messages").prepend($("<li>").html(`${msg.player.name} answered ${msg.answer} for ${value} points`))
+  $("#messages").prepend($("<li>").html(`${msg.player.name}: ${msg.answer} (${msg.value} points)`))
   var ind = msg.ind
   $("#questionText").append(msg.question.question.split(" ").slice(ind,msg.question.question.split(" ").length).join(" "))
-
+  socket.emit("update connections")
 })
 socket.on('incorrect', function(msg){
-  //update points
+  socket.emit("update connections")
+  console.log(msg.ended)
+  var value = msg.ended?0:-5;
+  $("#curBuzz").remove()
+  $("#messages").prepend($("<li>").html(`${msg.player.name}: ${msg.answer} (${value})`))
 })
 socket.on('prompt', function(msg){
-  $("#answerModal").modal({
-    dismissible: false,
-    inDuration: 0,
-    ready: function(modal, trigger){
-      window.curModal = "buzz"
-      $("#answerInput").focus()
-    },
-    complete:function(){
-      window.curModal = null
-    }
-  }).modal('open')
-  buzzTimer.start(5)
+  if(socket.id==msg.id){
+    $("#promptModal").modal({
+      dismissible: false,
+      inDuration: 0,
+      ready: function(modal, trigger){
+        window.curModal = "buzz"
+        $("#promptInput").focus()
+      },
+      complete:function(){
+        window.curModal = null
+      }
+    }).modal('open')
+    $("#promptInput").val(msg.ans)
+    buzzTimer.start(5)
+  }
+  $("#curBuzz").remove()
+  $("#messages").prepend($("<li id = \"curBuzz\">").html(`${msg.player.name}: ${msg.answer} (prompt)`))
 })
 socket.on('reset', function(){
   $('#buzzer').removeClass('disabled');
   // $('#messages').prepend($('<li>').text('reset!'));
-  $('#messages').prepend('<div class="divider"></div>');
+  // $('#messages').prepend('<div class="divider"></div>');
 });
 socket.on('new connection', function(msg){
   Materialize.toast(msg.id.name+" has connected!", 4000);
@@ -108,7 +118,10 @@ socket.on('end timer', function(sec){
   }
   $("#timer").html(sec)
 })
-socket.on('end question', function(question){
+socket.on('end question', function(msg){
+  var ind = msg.ind
+  $("#questionText").append(msg.question.question.split(" ").slice(ind,msg.question.question.split(" ").length).join(" "))
+  var question = msg.question
   $("#timer").css("background", "inherit")
   $("#timer").empty()
   $("#startq").html("Next Question")

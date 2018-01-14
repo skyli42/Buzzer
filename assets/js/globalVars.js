@@ -29,7 +29,34 @@ var buzzTimer = new Timer({
 		window.curModal = null
 	}
 });
-
+var promptTimer = new Timer({
+	onstart : function(millisec) {
+		var sec = Math.round(millisec / 1000, 2);
+		$("#promptTimer").text(sec);
+	},
+	ontick  : function(millisec) {
+		var sec = Math.round(millisec / 1000, 2);
+		$("#promptTimer").text(sec);
+	},
+	onstop  : function() {
+		socket.emit("answer", {
+			ans:$("#promptInput").val(),
+			id:socket.id
+		});
+		$("#promptInput").val("")
+		$("#promptModal").modal('close')
+		window.curModal = null
+	},
+	onend   : function() {
+		socket.emit("answer", {
+			ans:$("#promptInput").val(),
+			id: socket.id
+		});
+		$("#promptInput").val("")
+		$("#promptModal").modal('close')
+		window.curModal = null
+	}
+});
 
 
 function buzz(){

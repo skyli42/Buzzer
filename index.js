@@ -17,12 +17,12 @@ app.get('/', function(req, res){
 	res.sendFile(__dirname+ '/index.html');
 });
 
-var hsDb = []
-for(var i = 0; i<db.length; i++){
-	if(db[i].difficulty == "HS"){
-		hsDb.push(db[i])
-	}
-}
+var hsDb = db
+// for(var i = 0; i<db.length; i++){
+// 	if(db[i].difficulty == "HS"){
+// 		hsDb.push(db[i])
+// 	}
+// }
 
 var stop = null
 var cont = null
@@ -33,6 +33,7 @@ var curInd = -1
 var buzzing = false
 var prompting = false
 var answerShown = false
+var buzzed = 0
 
 var questionTimer = new Timer({
 	tick:0.001,
@@ -48,14 +49,18 @@ var questionTimer = new Timer({
 	},
 	onstop  : function() {
 		answerShown = true
-		io.emit('end question', curQ)
-
+		io.emit("end question", {
+			question: curQ,
+			ind:curInd
+		})
 	},
 	onend   : function() {
 		answerShown = true
-		io.emit('end question', curQ)
-	}
-});
+		io.emit("end question", {
+			question: curQ,
+			ind:curInd
+		})	}
+	});
 io.on('connection', function(socket){
 	io.to(socket.client.id).emit("update", {
 		question:curQ,
@@ -79,13 +84,17 @@ io.on('connection', function(socket){
 		}
 		players.set(socket.client.id, {
 			name:msg,
-			color: color
+			color: color,
+			points:0
 		});
 		var send={
 			id:players.get(socket.client.id),
 			arr:Array.from(players.values())
 		}
 		io.emit('new connection', send);
+	})
+	socket.on("update connections", function(){
+		io.emit('update connections', Array.from(players.values()))
 	})
 	socket.on('buzz', function(msg){
 		buzzing = true
@@ -125,15 +134,28 @@ io.on('connection', function(socket){
 		res = checkAnswer(answer, curQ.answer, curQ.question, {})
 		prompting = false
 		if(res === "prompt" && !prompting){
-			io.emit("prompt")
-			prompting = true
+			console.log('d')
+			io.emit("prompt", {
+				answer:answer,
+				id:id
+			})
+
 		}
 		else if(res){
+			var value = -1
+			if(curQ.question.includes("(*)") && curQ.question.split(" ").indexOf("(*)")>curInd){
+				value = 15
+			}
+			else{
+				value = 10
+			}
+			players.get(id).points+=value
 			io.emit("correct", {
 				answer:answer,
 				question:curQ,
 				ind:curInd,
-				player:players.get(id)
+				player:players.get(id),
+				value:value
 			})
 			questionTimer.stop()
 			if(ended){
@@ -145,17 +167,40 @@ io.on('connection', function(socket){
 			answerShown = true
 			paused = true
 			ended = true
-			io.emit("end question", curQ)
+
+			io.emit("end question", {
+				question: curQ,
+				ind:curInd
+			})
 		}
 		else{
 			if(ended){
 				questionTimer.start()
 			}
 			else{
+				players.get(id).points-=5;
+				console.log(players.get(id).points)
 				cont()
 			}
 			io.emit("reset")
-			io.emit("incorrect")
+			io.emit("incorrect", {
+				player:players.get(id),
+				answer: answer,
+				ended:ended
+			})
+			if(buzzed === players.size){
+				stop()
+				ended = true
+				paused = true
+				answerShown = true
+				io.emit("end question", {
+					question: curQ,
+					ind:curInd
+				})
+				questionTimer.stop()
+			}
+			
+
 		}
 	})
 	socket.on("continue", function(){
@@ -165,6 +210,7 @@ io.on('connection', function(socket){
 console.log("QBBuzz listening on port "+3000+"!")
 
 function buzz(id){
+	buzzed++;
 	io.emit('buzz', players.get(id));
 	name = players.get(id)
 	if(!ended){
@@ -184,6 +230,7 @@ function startQuestion(question){
 	curInd = 0;
 	paused = false
 	ended = false
+	buzzed = 0
 	// console.log("new question")
 	var read = setInterval(function(){
 		paused = false
@@ -194,7 +241,6 @@ function startQuestion(question){
 			paused = true
 			ended = true
 			questionTimer.start(5)
-			io.emit('end text')
 		}
 	}, 100)
 	function cont(){
