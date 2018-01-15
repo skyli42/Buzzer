@@ -141,7 +141,7 @@ module.exports = function(passport) {
                                 newUser.google.name = profile.displayName;
                                 newUser.google.email = profile.emails[0].value; // pull the first email
                                 newUser.points = 0
-                                newUser.username = email
+                                newUser.username = newUser.google.name
                                 // save the user
                                 newUser.save(function(err) {
                                     if (err)
@@ -158,7 +158,7 @@ module.exports = function(passport) {
                         user.google.token = token;
                         user.google.name = profile.name.givenName + ' ' + profile.name.familyName;
                         user.google.email = profile.emails[0].value;
-                        
+
                         // save the user
                         user.save(function(err) {
                             if (err)
