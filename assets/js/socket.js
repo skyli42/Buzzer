@@ -23,7 +23,7 @@ socket.on('update', function(msg){
     $("#questionText").html(question.question.split(" ").slice(0, i).join(" "))
     if(msg.answerShown){
       var ans = question.answer
-      ans=ans.replace(new RegExp('{', 'g'), "<strong>").replace(new RegExp('}', 'g'),"</strong>")
+      ans=ans.replace(new RegExp('{', 'g'), "<b>").replace(new RegExp('}', 'g'),"</b>")
       $("#answerText").html(`ANSWER: ${ans}`)
     }
   }
@@ -130,7 +130,7 @@ socket.on('end question', function(msg){
   $("#startq").html("Next Question")
   $("#startq").removeClass("disabled")
   var ans = question.answer
-  ans=ans.replace(new RegExp('{', 'g'), "<strong>").replace(new RegExp('}', 'g'),"</strong>")
+  ans=ans.replace(new RegExp('{', 'g'), "<b>").replace(new RegExp('}', 'g'),"</b>")
   $("#answerText").html(`ANSWER: ${ans}`)
   $("#buzzer").addClass("disabled")
 })
