@@ -37,7 +37,9 @@ $(window).keypress(function(e) {
             window.curModal = null
         } else if (window.curModal === "buzz") {
             buzzTimer.stop()
-        } else {}
+        } else if(window.curModal === "prompt"){
+            promptTimer.stop()
+        }
         return false;
     } else if (e.keyCode === 0 || e.keyCode === 32) {
         if (window.curModal == null) {

@@ -54,7 +54,7 @@ socket.on("you buzz", function(){
       window.curModal = null
     }
   }).modal('open')
-  buzzTimer.start(5)
+  buzzTimer.start(9)
 })
 socket.on("correct", function(msg){
   $("#curBuzz").remove()
@@ -76,7 +76,7 @@ socket.on('prompt', function(msg){
       dismissible: false,
       inDuration: 0,
       ready: function(modal, trigger){
-        window.curModal = "buzz"
+        window.curModal = "prompt"
         $("#promptInput").focus()
       },
       complete:function(){
@@ -84,7 +84,7 @@ socket.on('prompt', function(msg){
       }
     }).modal('open')
     $("#promptInput").val(msg.ans)
-    buzzTimer.start(5)
+    promptTimer.start(9)
   }
   $("#curBuzz").remove()
   $("#messages").prepend($("<li id = \"curBuzz\">").html(`${msg.player.name}: ${msg.answer} (prompt)`))
@@ -133,4 +133,10 @@ socket.on('end question', function(msg){
   ans=ans.replace(new RegExp('{', 'g'), "<b>").replace(new RegExp('}', 'g'),"</b>")
   $("#answerText").html(`ANSWER: ${ans}`)
   $("#buzzer").addClass("disabled")
+  $("#previousQuestions").prepend($("<li>").html(`
+    <div class = "collapsible-header">
+      <p>${ans}</p>
+      </div>
+      <div class = "collapsible-body"><p>${msg.question.question}</p></div>
+    `))
 })
