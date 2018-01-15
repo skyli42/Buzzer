@@ -11,6 +11,20 @@
 </head>
 
 <body>
+  <nav>
+    <div class="nav-wrapper">
+      <a href="/" class="website_title">QBBuzz</a>
+      <ul id="nav-mobile" class="right hide-on-med-and-down">
+        <% if(user==null){%>
+        <li><a href="/login">Login</a></li>
+        <li><a href="/signup">Signup</a></li>
+        <% }else {%>
+        <li><a href="/profile">Profile</a></li>
+        <li><a href="/logout">Logout</a></li>
+        <%}%>
+      </ul>
+    </div>
+  </nav>
   <div class="container">
     <div class="row">
       <a href="#"><div id="startq" class="col s6 button">New Question</div></a>
@@ -84,77 +98,9 @@
       <div id= "promptTimer"></div>
     </div>
   </div>
-
   <script src = "/js/globalVars.js"></script>
   <script src = "/js/socket.js"></script>
   <script src = "/js/buttons.js"></script>
-  <script>
-    $(document).ready(function(){
-      $("#modal1").modal({
-        dismissible:false,
-        ready:function(modal, trigger){
-          window.curModal = "name"
-        },
-        complete: function(){
-          console.log("complete")
-          window.curModal = null
-        }
-      }).modal('open');
-    });
-    $(window).keypress(function (e) {
-    // console.log(e.keyCode)
-    if (event.which == 13 || event.keyCode == 13) {
-      e.preventDefault()
-      if(window.curModal === "name"){
-        socket.emit('new player', $('#name').val());
-        $("#modal1").modal('close');
-        $("#name").val("")
-        window.curModal = null
-      }
-      else if (window.curModal === "buzz"){
-        buzzTimer.stop()
-        // socket.emit("answer", {
-        //   ans:$("#answerInput").val(),
-        //   id:socket.id
-        // });
-        // $("#answerInput").val("")
-        // $("#answerModal").modal('close')
-        // window.curModal = null
-      }
-      else{
-        //chat
-      }
-      return false;
-    }
-    else if (e.keyCode === 0 || e.keyCode === 32) {
-      if(window.curModal==null){
-        e.preventDefault()
-        var focused = $(':focus');
-        if(!focused.is("input") && !$('#buzzer').hasClass('disabled')){
-          buzz()
-        }
-        else if($('#buzzer').hasClass('disabled')){
-          Materialize.toast("You can't buzz right now!", 2000)
-        }
-      }
-    }
-    else if(e.keyCode === 82||e.keyCode === 114){
-      // console.log(window.curModal)
-      if(window.curModal == null && !$("#reset").hasClass("disabled"))
-        socket.emit("reset")
-    }
-    else if(e.keyCode === 67||e.keyCode === 99){
-      // console.log(window.curModal)
-      if(window.curModal == null)
-        socket.emit("continue")
-    }
-    else if(e.keyCode === 110 || e.keyCode === 78){
-      if(window.curModal == null && !$("#startq").hasClass("disabled")){
-        next();
-      }
-    }
-    else return true;
-  })
-</script>
+  <script src = "/js/window.js"></script>
 </body>
 </html>

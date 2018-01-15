@@ -1,6 +1,7 @@
 var socket = io();
 window.curModal = null
 window.eligible = true
+window.user = null
 var buzzTimer = new Timer({
 	onstart : function(millisec) {
 		var sec = Math.round(millisec / 1000, 2);
