@@ -1,6 +1,6 @@
 {
   "name": "QBBuzz",
-  "version": "0.2.1",
+  "version": "0.2.5",
   "engines": {
     "node": "6.11.3"
   },
