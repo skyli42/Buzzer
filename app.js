@@ -8,7 +8,7 @@ var mongoose = require('mongoose')
 var Schema = mongoose.Schema;
 mongoose.Promise = require('bluebird')
 var url = process.env.MONGOLAB_URL;
-console.log(url)
+
 var checkAnswer = require("./checker.js").checkAnswer
 var Timer = require("timer.js")
 var permcolors = ["White", "Silver", "Gray", "Black", "Red", "Maroon", "Yellow", "Olive", "Lime", "Green", "Aqua", "Teal", "Blue", "Navy", "Fuchsia", "Purple"]
@@ -76,10 +76,6 @@ var questionTimer = new Timer({
 	},
 	onstop: function() {
 		answerShown = true
-		io.emit("end question", {
-			question: curQ,
-			ind: curInd
-		})
 	},
 	onend: function() {
 		answerShown = true
@@ -149,10 +145,10 @@ db.once('open', function() {
             		});
                     // console.log("null user")
                 } else {
-                	console.log(msg.user)
+                	// console.log(msg.user)
                 	// var user = JSON.parse(JSON5.parse(msg.user).stringify())
                 	var user = msg.user
-                	console.log(user.points)
+                	// console.log(user.points)
                 	activePlayers.set(socket.client.id, {
                 		name: user.username,
                 		color: color,
@@ -167,11 +163,11 @@ db.once('open', function() {
                 io.emit('new connection', send);
             })
             socket.on("new username", function(msg) {
-            	console.log(msg)
+            	// console.log(msg)
 
             	User.findOneAndUpdate({ _id: msg.user._id }, { username: msg.username },{new:true}, function(err, doc) {
             		if(err)console.log(err)
-            			console.log(doc)
+            			// console.log(doc)
             		console.log(`Changed username to ${msg.username}`)
             	});
             })
@@ -260,7 +256,7 @@ db.once('open', function() {
             			questionTimer.start()
             		} else {
             			activePlayers.get(id).points -= 5;
-            			console.log(activePlayers.get(id).points)
+            			// console.log(activePlayers.get(id).points)
             			cont()
             		}
             		io.emit("reset")
