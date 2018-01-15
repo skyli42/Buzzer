@@ -4,7 +4,7 @@ var server = app.listen(process.env.PORT || 3000);
 var io = require('socket.io').listen(server);
 var fs = require('fs')
 var MongoClient = require('mongodb').MongoClient;
-var mongoose = require('mongoose').set('debug', true);
+var mongoose = require('mongoose')
 var Schema = mongoose.Schema;
 mongoose.Promise = require('bluebird')
 var url = process.env.MONGOLAB_URL;
@@ -28,7 +28,7 @@ var session = require('express-session');
 require('./config/passport')(passport); // pass passport for configuration
 
 
-app.use(morgan('dev')); // log every request to the console
+// app.use(morgan('dev')); // log every request to the console
 app.use(cookieParser()); // read cookies (needed for auth)
 app.use(bodyParser()); // get information from html forms
 app.set('view engine', 'ejs'); // set up ejs for templating
