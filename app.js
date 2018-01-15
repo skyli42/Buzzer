@@ -95,6 +95,7 @@ var questionSchema = new Schema({
 	num: Number,
 	answer: String,
 	seen: Number,
+    year:Number,
 	type: String,
 	round: String
 });
