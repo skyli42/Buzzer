@@ -1,0 +1,25 @@
+{
+  "name": "buzzer",
+  "version": "1.0.0",
+  "description": "Simple online buzzer system for Quiz Bowl practice",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/skyli42/Buzzer.git"
+  },
+  "author": "Sky Li",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/skyli42/Buzzer/issues"
+  },
+  "homepage": "https://github.com/skyli42/Buzzer#readme",
+  "devDependencies": {
+    "typescript": "^3.3.1"
+  },
+  "dependencies": {
+    "express": "^4.16.4"
+  }
+}
